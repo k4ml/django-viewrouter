@@ -1,0 +1,6 @@
+syntax:glob
+bin
+lib
+include
+*.pyc
+*.swp
