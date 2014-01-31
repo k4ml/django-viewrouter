@@ -8,6 +8,11 @@ from viewrouter.routers import Router
 from viewrouter.views import ActionView
 
 class TestView(ActionView):
+    urls = [
+        ('^retrieve/%s/pass/$', 'retrieve', 'retrieve'),
+    ]
+    urls = []
+
     def index(self, request):
         return HttpResponse('index')
 
@@ -27,7 +32,7 @@ test_router = Router(TestView)
 urlpatterns = patterns('', url(r'', include(test_router.urls)))
 
 class TestRouting(TestCase):
-    urls = 'viewrouter.tests'
+    urls = urlpatterns
 
     def test_view(self):
         url = reverse('testview:retrieve', kwargs={'pk': '2'})
@@ -40,3 +45,20 @@ class TestRouting(TestCase):
         assert url == '/', url
         url = reverse('testview:create')
         assert url == '/create/', url
+
+class TestRoutingOverride(TestCase):
+    class TestView(ActionView):
+        urls = [
+            ('^retrieve/(?P<pk>\d+)/pass/$', 'retrieve', 'retrieve'),
+        ]
+
+        def retrieve(self, request, pk):
+            return HttpResponse('hello %d' % int(pk))
+
+    test_router = Router(TestView)
+    urlpatterns = patterns('', url(r'', include(test_router.urls)))
+    urls = urlpatterns
+
+    def test_view(self):
+        url = reverse('testview:retrieve', kwargs={'pk': '2'})
+        assert url == '/retrieve/2/pass/', url

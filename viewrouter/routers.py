@@ -13,9 +13,20 @@ class Router(object):
     @property
     def urls(self):
         urlpatterns = patterns('')
+        overidden_actions = []
+        for _url in self.view.urls:
+            pattern, action, urlname = _url
+            overidden_actions.append(action)
+            urlpatterns += patterns('',
+                url(pattern, self.view.as_view(route_action=action), name=urlname)
+            )
+
         for action in dir(self.view):
             if action not in self.action_allowed:
                 continue
+            if action in overidden_actions:
+                continue
+
             if action in self.action_has_pk:
                 pattern = r'^%s/(?P<pk>\d+)/$' % action
             else:
