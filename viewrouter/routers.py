@@ -15,10 +15,15 @@ class Router(object):
         urlpatterns = patterns('')
         overidden_actions = []
         for _url in self.view.urls:
-            pattern, action, urlname = _url
+            pattern, action, urlname, http_methods = _url
             overidden_actions.append(action)
+            kwargs = {
+                'route_action': action,
+            }
+            if len(http_methods) > 0:
+                kwargs['http_method_names'] = http_methods
             urlpatterns += patterns('',
-                url(pattern, self.view.as_view(route_action=action), name=urlname)
+                url(pattern, self.view.as_view(**kwargs), name=urlname)
             )
 
         for action in dir(self.view):

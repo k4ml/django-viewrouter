@@ -49,7 +49,8 @@ class TestRouting(TestCase):
 class TestRoutingOverride(TestCase):
     class TestView(ActionView):
         urls = [
-            ('^retrieve/(?P<pk>\d+)/pass/$', 'retrieve', 'retrieve'),
+            ('^retrieve/(?P<pk>\d+)/pass/$', 'retrieve', 'retrieve', []),
+            ('^update/(?P<pk>\d+)/$', 'update', 'update', ['post']),
         ]
 
         def retrieve(self, request, pk):
