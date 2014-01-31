@@ -2,8 +2,8 @@
 from django.conf.urls import include, patterns, url
 
 class Router(object):
-    action_allowed = ['index', 'retrieve']
-    action_has_pk = ['retrieve']
+    action_allowed = ['index', 'retrieve', 'update']
+    action_has_pk = ['retrieve', 'update']
     
     def __init__(self, view, urls=None):
         self.view = view
