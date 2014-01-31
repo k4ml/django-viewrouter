@@ -10,6 +10,17 @@ class Router(object):
         self.view_name = view.__name__.lower()
         self.urlpatterns = urls
 
+    def build_urlpatterns(self, pattern, action, urlname, http_methods):
+        kwargs = {
+            'route_action': action,
+        }
+        if len(http_methods) > 0:
+            kwargs['http_method_names'] = http_methods
+        urlpatterns = patterns('',
+            url(pattern, self.view.as_view(**kwargs), name=urlname)
+        )
+        return urlpatterns
+        
     @property
     def urls(self):
         urlpatterns = patterns('')
@@ -17,14 +28,7 @@ class Router(object):
         for _url in self.view.urls:
             pattern, action, urlname, http_methods = _url
             overidden_actions.append(action)
-            kwargs = {
-                'route_action': action,
-            }
-            if len(http_methods) > 0:
-                kwargs['http_method_names'] = http_methods
-            urlpatterns += patterns('',
-                url(pattern, self.view.as_view(**kwargs), name=urlname)
-            )
+            urlpatterns += self.build_urlpatterns(pattern, action, urlname, http_methods)
 
         for action in dir(self.view):
             if action not in self.action_allowed:
@@ -44,11 +48,8 @@ class Router(object):
             as_view_kwargs = {
                 'route_action': action,
             }
-            if len(_http_methods) > 0:
-                as_view_kwargs['http_method_names'] = _http_methods
-            urlpatterns += patterns('',
-                url(pattern, self.view.as_view(**as_view_kwargs), name=_urlname or action),
-            )
+            urlpatterns += self.build_urlpatterns(pattern, action, _urlname or action,
+                                                  _http_methods)
             if action == 'index':
                 urlpatterns += patterns('',
                     url(r'^$', self.view.as_view(route_action=action), name='index'),
