@@ -2,6 +2,8 @@
 from django.conf.urls import include, patterns, url
 
 class Router(object):
+    action_allowed = ['index', 'retrieve']
+    action_has_pk = ['retrieve']
     
     def __init__(self, view, urls=None):
         self.view = view
@@ -10,9 +12,20 @@ class Router(object):
 
     @property
     def urls(self):
-        urlpatterns = patterns('',
-            url(r'^$', self.view.as_view(route_action='index'), name='index'),
-            url(r'^index/$', self.view.as_view(route_action='index'), name='index'),
-            url(r'^retrieve/(?P<pk>\d+)/$', self.view.as_view(route_action='retrieve'), name='retrieve'),
-        )
+        urlpatterns = patterns('')
+        for action in dir(self.view):
+            if action not in self.action_allowed:
+                continue
+            if action in self.action_has_pk:
+                pattern = r'^%s/(?P<pk>\d+)/$' % action
+            else:
+                pattern = r'^%s/$' % action
+
+            urlpatterns += patterns('',
+                url(pattern, self.view.as_view(route_action=action), name=action),
+            )
+            if action == 'index':
+                urlpatterns += patterns('',
+                    url(r'^$', self.view.as_view(route_action=action), name='index'),
+                )
         return (urlpatterns, self.view_name, self.view_name)
