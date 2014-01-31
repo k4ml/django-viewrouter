@@ -4,6 +4,7 @@ from django.views.generic.base import View
 
 class ActionView(View):
     route_action = 'index'
+    urls = []
 
     def dispatch(self, request, *args, **kwargs):
         if request.method.lower() in self.http_method_names:

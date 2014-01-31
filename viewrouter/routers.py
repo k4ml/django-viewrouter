@@ -32,16 +32,31 @@ class Router(object):
             if action in overidden_actions:
                 continue
 
-            if action in self.action_has_pk:
+            action_callable = getattr(self.view, action, None)
+            _urlname, _http_methods = None, []
+            if action_callable is not None and hasattr(action_callable, '_route'):
+                pattern, _urlname, _http_methods = action_callable._route
+            elif action in self.action_has_pk:
                 pattern = r'^%s/(?P<pk>\d+)/$' % action
             else:
                 pattern = r'^%s/$' % action
 
+            as_view_kwargs = {
+                'route_action': action,
+            }
+            if len(_http_methods) > 0:
+                as_view_kwargs['http_method_names'] = _http_methods
             urlpatterns += patterns('',
-                url(pattern, self.view.as_view(route_action=action), name=action),
+                url(pattern, self.view.as_view(**as_view_kwargs), name=_urlname or action),
             )
             if action == 'index':
                 urlpatterns += patterns('',
                     url(r'^$', self.view.as_view(route_action=action), name='index'),
                 )
         return (urlpatterns, self.view_name, self.view_name)
+
+def route(pattern=None, name=None, http_methods=None):
+    def decorator(fn):
+        fn._route = (pattern, name or fn.__name__, http_methods or [])
+        return fn
+    return decorator
