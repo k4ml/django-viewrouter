@@ -35,7 +35,12 @@ class Router(object):
         for _url in self.view.urls:
             pattern, action, urlname, http_methods = _url
             overidden_actions.append(action)
-            urlpatterns += self.build_urlpatterns(pattern, action, urlname, http_methods)
+            urlpatterns += self.build_urlpatterns(
+                    pattern,
+                    action,
+                    urlname, 
+                    http_methods
+                )
 
         for action in dir(self.view):
             if action not in self.action_allowed:
@@ -45,7 +50,8 @@ class Router(object):
 
             action_callable = getattr(self.view, action, None)
             _urlname, _http_methods = None, []
-            if action_callable is not None and hasattr(action_callable, '_route'):
+            if (action_callable is not None and
+                    hasattr(action_callable, '_route')):
                 pattern, _urlname, _http_methods = action_callable._route
             else:
                 pattern = self.build_default_pattern(action)
@@ -58,10 +64,21 @@ class Router(object):
             as_view_kwargs = {
                 'route_action': action,
             }
-            urlpatterns += self.build_urlpatterns(pattern, action, _urlname or action,
-                                                  _http_methods)
+            urlpatterns += self.build_urlpatterns(
+                            pattern,
+                            action,
+                            _urlname or action,
+                            _http_methods
+                        )
+
+            # allow index to be accessed as /
             if action == 'index':
-                urlpatterns += self.build_urlpatterns(r'^$', action, _urlname or action, _http_methods)
+                urlpatterns += self.build_urlpatterns(
+                            r'^$',
+                            action,
+                            _urlname or action,
+                            _http_methods
+                        )
         return (urlpatterns, self.view_name, self.view_name)
 
 def route(pattern=None, name=None, http_methods=None):
