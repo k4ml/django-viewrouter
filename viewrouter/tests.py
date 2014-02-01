@@ -88,6 +88,10 @@ class TestRoutingDecorator(TestCase):
         def update(self, request, id):
             return HttpResponse('update %d' % int(id))
 
+        @route(http_methods=['get'])
+        def index(self, request):
+            return HttpResponse('index')
+
     test_router = Router(TestView)
     urlpatterns = patterns('', url(r'', include(test_router.urls)))
     urls = urlpatterns
@@ -105,3 +109,13 @@ class TestRoutingDecorator(TestCase):
 
         resp = self.client.get(url)
         assert resp.status_code == 405, resp.status_code
+
+    def test_view_decorate_method_only(self):
+        url = reverse('testview:index')
+        assert url == '/', url
+
+        resp = self.client.post(url, data={'name': 'test'})
+        assert resp.status_code == 405, resp.status_code
+
+        resp = self.client.get(url)
+        assert resp.status_code == 200, resp.status_code
