@@ -45,15 +45,20 @@ class Router(object):
             else:
                 pattern = r'^%s/$' % action
 
+            # pattern still None, a case when user using @route decorator
+            # but does not specify pattern
+            if pattern is None:
+                if action in self.action_has_pk:
+                    pattern = r'^%s/(?P<pk>\d+)/$' % action
+                else:
+                    pattern = pattern or r'^%s/$' % action
             as_view_kwargs = {
                 'route_action': action,
             }
             urlpatterns += self.build_urlpatterns(pattern, action, _urlname or action,
                                                   _http_methods)
             if action == 'index':
-                urlpatterns += patterns('',
-                    url(r'^$', self.view.as_view(route_action=action), name='index'),
-                )
+                urlpatterns += self.build_urlpatterns(r'^$', action, _urlname or action, _http_methods)
         return (urlpatterns, self.view_name, self.view_name)
 
 def route(pattern=None, name=None, http_methods=None):

@@ -88,6 +88,14 @@ class TestRoutingDecorator(TestCase):
         def update(self, request, id):
             return HttpResponse('update %d' % int(id))
 
+        @route(http_methods=['get'])
+        def index(self, request):
+            return HttpResponse('index')
+
+        @route(http_methods=['post'])
+        def delete(self, request, pk):
+            return HttpResponse('delete %s' % pk)
+
     test_router = Router(TestView)
     urlpatterns = patterns('', url(r'', include(test_router.urls)))
     urls = urlpatterns
@@ -99,6 +107,26 @@ class TestRoutingDecorator(TestCase):
     def test_view_post_only(self):
         url = reverse('testview:update', kwargs={'id': '2'})
         assert url == '/update/2/pass/', url
+
+        resp = self.client.post(url, data={'name': 'test'})
+        assert resp.status_code == 200, resp.status_code
+
+        resp = self.client.get(url)
+        assert resp.status_code == 405, resp.status_code
+
+    def test_view_decorate_method_only(self):
+        url = reverse('testview:index')
+        assert url == '/', url
+
+        resp = self.client.post(url, data={'name': 'test'})
+        assert resp.status_code == 405, resp.status_code
+
+        resp = self.client.get(url)
+        assert resp.status_code == 200, resp.status_code
+
+    def test_view_decorate_method_only_has_pk(self):
+        url = reverse('testview:delete', kwargs={'pk': 2})
+        assert url == '/delete/2/', url
 
         resp = self.client.post(url, data={'name': 'test'})
         assert resp.status_code == 200, resp.status_code
