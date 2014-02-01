@@ -13,5 +13,5 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'', include(myapp_router.urls))
+    url(r'^myview/', include(myapp_router.urls))
 )
