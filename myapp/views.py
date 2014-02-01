@@ -16,7 +16,7 @@ class ArticleView(ActionView):
         ctx = {'articles': articles}
         return render(request, 'index.html', ctx)
 
-    @route(http_methods=['get'])
+    @route(r'^submit-story/$', http_methods=['get'])
     def create_form(self, request):
         form = ArticleForm()
         ctx = {'form': form}
@@ -32,8 +32,9 @@ class ArticleView(ActionView):
         ctx = {'form': form}
         return render(request, 'create_form.html', ctx)
 
-    def retrieve(self, request, pk):
-        return HttpResponse('hello %d' % int(pk))
+    @route(r'^(?P<slug>[-\w]+)/$')
+    def retrieve(self, request, slug):
+        return HttpResponse('hello %s' % slug)
 
     def update(self, request, pk):
         return HttpResponse('update %d' % int(pk))
