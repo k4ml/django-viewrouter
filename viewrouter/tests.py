@@ -96,6 +96,14 @@ class TestRoutingDecorator(TestCase):
         def delete(self, request, pk):
             return HttpResponse('delete %s' % pk)
 
+        @route(http_methods=['post'])
+        def set_password(self, request):
+            return HttpResponse('set password')
+
+        @route(r'^filter-group/(?P<pk>\d+)/group/(?P<group>\d+)/$')
+        def filter_group(self, pk, group=None):
+            return HttpResponse('filter_group %s %s' % (pk, group))
+
     test_router = Router(TestView)
     urlpatterns = patterns('', url(r'', include(test_router.urls)))
     urls = urlpatterns
@@ -133,3 +141,11 @@ class TestRoutingDecorator(TestCase):
 
         resp = self.client.get(url)
         assert resp.status_code == 405, resp.status_code
+
+    def test_view_decorate_custom_action(self):
+        url = reverse('testview:set_password')
+        assert url == '/set_password/', url
+
+    def test_view_decorate_custom_action_with_pattern(self):
+        url = reverse('testview:filter_group', kwargs={'pk': 2, 'group': 4})
+        assert url == '/filter-group/2/group/4/', url

@@ -43,12 +43,13 @@ class Router(object):
                 )
 
         for action in dir(self.view):
+            action_callable = getattr(self.view, action, None)
             if action not in self.action_allowed:
-                continue
+                if not hasattr(action_callable, '_route'):
+                    continue
             if action in overidden_actions:
                 continue
 
-            action_callable = getattr(self.view, action, None)
             _urlname, _http_methods = None, []
             if (action_callable is not None and
                     hasattr(action_callable, '_route')):
