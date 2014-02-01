@@ -20,6 +20,13 @@ class Router(object):
             url(pattern, self.view.as_view(**kwargs), name=urlname)
         )
         return urlpatterns
+    
+    def build_default_pattern(self, action):
+        if action in self.action_has_pk:
+            pattern = r'^%s/(?P<pk>\d+)/$' % action
+        else:
+            pattern = r'^%s/$' % action
+        return pattern
         
     @property
     def urls(self):
@@ -40,18 +47,14 @@ class Router(object):
             _urlname, _http_methods = None, []
             if action_callable is not None and hasattr(action_callable, '_route'):
                 pattern, _urlname, _http_methods = action_callable._route
-            elif action in self.action_has_pk:
-                pattern = r'^%s/(?P<pk>\d+)/$' % action
             else:
-                pattern = r'^%s/$' % action
+                pattern = self.build_default_pattern(action)
 
             # pattern still None, a case when user using @route decorator
             # but does not specify pattern
             if pattern is None:
-                if action in self.action_has_pk:
-                    pattern = r'^%s/(?P<pk>\d+)/$' % action
-                else:
-                    pattern = pattern or r'^%s/$' % action
+                pattern = self.build_default_pattern(action)
+
             as_view_kwargs = {
                 'route_action': action,
             }
