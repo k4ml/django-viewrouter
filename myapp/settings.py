@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'viewrouter',
     'django_nose',
+    'myapp',
 )
 
 MIDDLEWARE_CLASSES = (

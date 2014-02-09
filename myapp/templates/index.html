@@ -1,0 +1,6 @@
+<ul>
+{% for article in articles %}
+    <li><a href="{% url 'articleview:retrieve' slug=article.slug %}">{{ article.title }}</a></li>
+{% endfor %}
+</ul>
+<a href="{% url 'articleview:create_form' %}">Submit story now !</a>
