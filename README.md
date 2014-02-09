@@ -84,7 +84,7 @@ Unlike django built-in class based views which route based on HTTP methods, this
 all HTTP methods as long as the url pattern matched. To restrict the HTTP methods allowed,
 use `http_methods`parameter to `@route` decorator:-
 
-````
+```python
     @route(r'^set-password/(?<user_id>\d+)/', http_methods=['post'])
     def set_password(self, user_id):
         return HttpResponse('change password for user %s' % user_id)
