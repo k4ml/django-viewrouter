@@ -4,6 +4,10 @@ of dispatching incoming http request to HTTP verbs such as 'GET', 'POST',
 delete, and delete. For browser based apps, I found the CRUD action make
 more sense, after all in the browser we only limited to GET and POST so not much gain to split our request handler into proper HTTP method.
 
+## Installation
+
+    pip install https://bitbucket.org/k4ml/django-viewrouter/get/tip.zip
+
 ## Usage
 Create a view class like below:-
 
