@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from django.conf.urls import include, patterns, url
+from django.urls import include, path
 
 class Router(object):
     action_allowed = ['index', 'create', 'retrieve', 'update', 'delete']
@@ -37,21 +37,21 @@ class Router(object):
         }
         if len(http_methods) > 0:
             kwargs['http_method_names'] = http_methods
-        urlpatterns = patterns('',
-            url(pattern, self.view.as_view(**kwargs), name=urlname)
-        )
+        urlpatterns = [
+                path(pattern, self.view.as_view(**kwargs), name=urlname)
+            ]
         return urlpatterns
     
     def build_default_pattern(self, action):
         if action in self.action_has_pk:
-            pattern = r'^%s/(?P<pk>\d+)/$' % action
+            pattern = f'{action}/<int:pk>/'
         else:
-            pattern = r'^%s/$' % action
+            pattern = f'{action}/'
         return pattern
         
     @property
     def urls(self):
-        urlpatterns = patterns('')
+        urlpatterns = []
         overidden_actions = []
         for _url in self.view.urls:
             pattern, action, urlname, http_methods = _url
@@ -96,7 +96,7 @@ class Router(object):
             # allow index to be accessed as /
             if action == 'index':
                 urlpatterns += self.build_urlpatterns(
-                            r'^$',
+                            "",
                             action,
                             _urlname or action,
                             _http_methods

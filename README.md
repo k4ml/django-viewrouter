@@ -16,16 +16,16 @@ from django.http import HttpResponse
 from viewrouter.views import ActionView
 
 class ArticleView(ActionView):
-    def index(self):
+    def index(self, request):
         return HttpResponse('this is index')
 
-    def retrieve(self, pk):
+    def retrieve(self, request, pk):
         return HttpResponse('this is article %s' % pk)
 
-    def delete(self, pk):
+    def delete(self, request, pk):
         return HttpResponse('deleting %s' % pk)
 
-    def update(self, pk):
+    def update(self, request, pk):
         return HttpResponse('updating %s' % pk)
 
 ```
@@ -33,7 +33,7 @@ class ArticleView(ActionView):
 Then in your `urls.py`:-
 
 ```python
-from django.conf.urls import patterns, include, url
+from django.urls import include, path
 from viewrouter.routers import Router
 
 from yourproject.views import ArticleView
@@ -41,11 +41,11 @@ from yourproject.views import ArticleView
 article_router = Router(ArticleView)
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'myapp.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+    # path('', 'myapp.views.home', name='home'),
+    # path('blog/', include('blog.urls')),
 
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^article/', include(article_router.urls))
+    path('admin/', include(admin.site.urls)),
+    path('article/', include(article_router.urls))
 )
 ```
 The following url now accessible:-
