@@ -6,7 +6,7 @@ more sense, after all in the browser we only limited to GET and POST so not much
 
 ## Installation
 
-    pip install https://bitbucket.org/k4ml/django-viewrouter/get/tip.zip
+    pip install https://github.com/k4ml/django-viewrouter/archive/refs/heads/main.zip
 
 ## Usage
 Create a view class like below:-
