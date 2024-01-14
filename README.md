@@ -44,8 +44,8 @@ urlpatterns = patterns('',
     # path('', 'myapp.views.home', name='home'),
     # path('blog/', include('blog.urls')),
 
-    path('admin/', include(admin.site.urls)),
-    path('article/', include(article_router.urls))
+    path('admin/', admin.site.urls),
+    path('article/', article_router.urls)
 )
 ```
 The following url now accessible:-
@@ -55,6 +55,12 @@ The following url now accessible:-
 * /article/update/<pk>/
 * /article/retrieve/<pk>/
 * /article/delete/<pk>/
+
+We can also use the following shortcuts instead:-
+
+```
+    path('article/', ArticleView.get_urls())
+```
 
 By default the following methods on your class based views will be automatically routed:-
 

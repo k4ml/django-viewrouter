@@ -37,3 +37,8 @@ class ActionView(View):
 
     def not_found(self, *args, **kwargs):
         return HttpResponseNotFound()
+
+    @classmethod
+    def get_urls(cls):
+        from .routers import Router
+        return Router(cls).urls
