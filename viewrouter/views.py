@@ -22,10 +22,13 @@ THE SOFTWARE.
 
 from django.http import HttpResponse, HttpResponseNotFound
 from django.views.generic.base import View
+from django.shortcuts import render
 
 class ActionView(View):
     route_action = 'index'
     urls = []
+    template_prefix = None
+    model = None
 
     def dispatch(self, request, *args, **kwargs):
         if request.method.lower() in self.http_method_names:
@@ -33,10 +36,43 @@ class ActionView(View):
         else:
             handler = self.http_method_not_allowed
 
-        return handler(request, *args, **kwargs)
+        response = handler(request, *args, **kwargs)
+        if getattr(response, "is_rendered", None):
+            # assume a TemplateResponse
+            if not response.template_name:
+                response.template_name = self.get_template()
+        return response
 
     def not_found(self, *args, **kwargs):
         return HttpResponseNotFound()
+
+    def get_template(self):
+        app_name = self.request.resolver_match.app_name
+        class_name = self.__class__.__name__.lower()
+        template_name = f"{class_name}_{self.route_action}.html"
+        prefix = None
+        templates = []
+
+        if self.model:
+            prefix = self.model._meta.app_label + "/"
+        if self.template_prefix:
+            prefix = self.template_prefix
+
+        if prefix:
+            templates.append(f"{prefix}{template_name}")
+            templates.append(f"{prefix}actionview_{self.route_action}.html")
+        templates.append(template_name)
+        templates.append(f"viewrouter/actionview_{self.route_action}.html")
+        return templates
+
+    def get_object(self, *args, **kwargs):
+        if not self.model:
+            raise Exception("model not defined")
+
+        return self.model.objects.get(*args, **kwargs)
+
+    def index(self, *args, **kwargs):
+        return render(self.request, self.get_template())
 
     @classmethod
     def get_urls(cls):
