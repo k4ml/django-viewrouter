@@ -5,7 +5,7 @@ description = ""
 authors = ["Kamal Mustafa <k4ml@github.io>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "django_viewrouter"}]
+packages = [{include = "viewrouter"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
