@@ -101,7 +101,7 @@ class Router(object):
                             _urlname or action,
                             _http_methods
                         )
-        return (urlpatterns, self.view_name)
+        return (urlpatterns, self.view_name, self.view_name)
 
 def route(pattern=None, name=None, http_methods=None):
     def decorator(fn):
